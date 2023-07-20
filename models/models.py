@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, validator
-from typing import List
+from typing import Dict
 import re
 
 def validate_brazilian_phone_number(phone_number: str) -> str:
@@ -15,12 +15,12 @@ def validate_brazilian_cep(cep: str) -> str:
         raise ValueError("Invalid Brazilian CEP format. Use 'XXXXX-XXX'")
     return cep
 
-class Order(BaseModel):
+class OrderBase(BaseModel):
     customer_name: str
     email: EmailStr
     cep: str 
     phone_number: str
-    items: List[str]
+    items: Dict[int, int]
 
     @validator("items")
     def validate_items(cls, v):
@@ -35,3 +35,30 @@ class Order(BaseModel):
     @validator("cep")
     def validate_cep(cls, v):
         return validate_brazilian_cep(v)
+    
+class OrderWrite(OrderBase):
+    pass
+
+class OrderRead(OrderBase):
+    id: int
+
+class Item(BaseModel):
+    id: int
+    name: str
+    description: str
+    price: float
+    quantity: int
+
+    @validator('price')
+    def validate_price(cls, value):
+        if value <= 0:
+            raise ValueError("Price must be greater than zero")
+        return value
+
+    @validator('quantity')
+    def validate_quantity(cls, value):
+        if value < 0:
+            raise ValueError("Quantity must be greater than zero")
+        return value
+
+

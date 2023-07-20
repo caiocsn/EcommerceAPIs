@@ -1,7 +1,16 @@
+from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, Integer, String, Text, Boolean
 
 Base = declarative_base()
+
+class ItemDB(Base):
+    __tablename__ = "items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    description = Column(String)
+    price = Column(Float)
+    quantity = Column(Integer)
 
 class OrderDB(Base):
     __tablename__ = "orders"
@@ -11,4 +20,4 @@ class OrderDB(Base):
     email = Column(String)
     cep = Column(String)
     phone_number = Column(String)
-    items = Column(Text)
+    items = Column(String)
