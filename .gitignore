@@ -1,0 +1,31 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Ignore local virtual environment
+venv/
+env/
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+
+# Ignore logs and output files
+*.log
+*.out
+
+# Ignore database files
+*.db
+*.sqlite
+
+# Ignore dependency and build files
+/.venv
+/dist
+/build
+*.egg-info
+
+# Ignore .env file with sensitive information (if applicable)
+.env
+
+# Ignore migration files (if using Alembic)
+alembic/versions/
