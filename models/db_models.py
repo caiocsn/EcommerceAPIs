@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, Enum
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
@@ -21,3 +21,6 @@ class OrderDB(Base):
     cep = Column(String)
     phone_number = Column(String)
     items = Column(String)
+    
+    status_choices = ["created", "cancelled", "payed", "processing", "sent", "delivered"]
+    status = Column(Enum(*status_choices))
