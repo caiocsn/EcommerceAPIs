@@ -1,18 +1,12 @@
-# File: order_management.py
 import json
 import re
-from fastapi import FastAPI, HTTPException, Query
-from pydantic import BaseModel, EmailStr, constr, validator
+
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, EmailStr, validator
 from typing import List
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from models import *
-
-DATABASE_URL = "sqlite:///./orders.db"
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+from db_models import *
+from db import SessionLocal
 
 def validate_brazilian_phone_number(phone_number: str) -> str:
     digits_only = "".join(filter(str.isdigit, phone_number))
