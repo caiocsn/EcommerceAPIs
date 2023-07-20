@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException, Query
 from models import Item
 from db_models import ItemDB
 from db import SessionLocal
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 app = FastAPI()
 
@@ -56,3 +56,29 @@ def delete_item(item_id: int):
     db.commit()
     db.close()
     return Item(**item.__dict__)
+
+@app.put("/items/subtract/")
+def subtract_items(items_to_subtract: Dict[int, int]):
+    db = SessionLocal()
+
+    for item_id, quantity_to_subtract in items_to_subtract.items():
+        item = db.query(ItemDB).filter(ItemDB.id == item_id).first()
+
+        if quantity_to_subtract <= 0:
+            db.close()
+            raise HTTPException(status_code=400, detail=f"Invalid quantity to subtract for item with id {item_id}")
+
+        if item is None:
+            db.close()
+            raise HTTPException(status_code=404, detail=f"Item with id {item_id} not found")
+
+        if item.quantity < quantity_to_subtract:
+            db.close()
+            raise HTTPException(status_code=400, detail=f"Not enough items of id {item_id} in the inventory")
+
+        item.quantity -= quantity_to_subtract
+
+    db.commit()
+    db.close()
+
+    return {"message": "Items subtracted successfully"}

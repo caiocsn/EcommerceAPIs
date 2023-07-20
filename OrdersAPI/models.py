@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, validator
-from typing import List
+from typing import List, Dict
 import re
 
 def validate_brazilian_phone_number(phone_number: str) -> str:
@@ -20,12 +20,7 @@ class OrderBase(BaseModel):
     email: EmailStr
     cep: str 
     phone_number: str
-    items: List[str]
-
-    class Config:
-        orm_mode = True
-        allow_population_by_field_name = True
-        exclude = {"id"}
+    items: Dict[int, int]
 
     @validator("items")
     def validate_items(cls, v):
