@@ -41,6 +41,7 @@ class OrderWrite(OrderBase):
 
 class OrderRead(OrderBase):
     id: int
+    status: str
 
 class Item(BaseModel):
     id: int

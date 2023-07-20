@@ -24,6 +24,7 @@ def create_order(order: OrderWrite):
     
     db = SessionLocal()
     order_dict["items"] = json.dumps(order_dict["items"])
+    order_dict["status"] = "created"
     db_order = OrderDB(**order_dict)
     db.add(db_order)
     db.commit()
