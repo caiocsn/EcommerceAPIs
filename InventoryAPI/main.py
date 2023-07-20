@@ -1,9 +1,16 @@
+import os 
+import sys
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(parent_dir)
+
 from fastapi import FastAPI, HTTPException, Query
 
-from models import Item
-from db_models import ItemDB
-from db import SessionLocal
 from typing import List, Optional, Dict
+
+from models.models import Item
+from models.db_models import ItemDB
+from db.db import SessionLocal
 
 app = FastAPI()
 
@@ -55,7 +62,7 @@ def delete_item(item_id: int):
     db.delete(item)
     db.commit()
     db.close()
-    return Item(**item.__dict__)
+    return Item(**  item.__dict__)
 
 @app.put("/items/subtract/")
 def subtract_items(items_to_subtract: Dict[int, int]):

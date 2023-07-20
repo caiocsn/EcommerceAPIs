@@ -11,3 +11,13 @@ class ItemDB(Base):
     description = Column(String)
     price = Column(Float)
     quantity = Column(Integer)
+
+class OrderDB(Base):
+    __tablename__ = "orders"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    customer_name = Column(String, index=True)
+    email = Column(String)
+    cep = Column(String)
+    phone_number = Column(String)
+    items = Column(String)

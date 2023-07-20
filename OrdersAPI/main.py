@@ -1,18 +1,28 @@
 import json
+import os 
+import sys
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(parent_dir)
 
 from fastapi import FastAPI, HTTPException
 
-from db_models import OrderDB
-from models import OrderWrite, OrderRead
-from db import SessionLocal
+from models.db_models import OrderDB
+from models.models import OrderWrite, OrderRead
+from db.db import SessionLocal
+from .utils import call_subtract_items_api
 
 
 app = FastAPI()
 
 @app.post("/orders/", response_model=OrderWrite)
 def create_order(order: OrderWrite):
-    db = SessionLocal()
     order_dict = order.dict()
+    inventory_status = call_subtract_items_api(order_dict["items"])    
+    if  inventory_status != 200:
+        raise HTTPException(status_code = inventory_status , detail="Items not available")
+    
+    db = SessionLocal()
     order_dict["items"] = json.dumps(order_dict["items"])
     db_order = OrderDB(**order_dict)
     db.add(db_order)
