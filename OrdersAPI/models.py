@@ -15,12 +15,17 @@ def validate_brazilian_cep(cep: str) -> str:
         raise ValueError("Invalid Brazilian CEP format. Use 'XXXXX-XXX'")
     return cep
 
-class Order(BaseModel):
+class OrderBase(BaseModel):
     customer_name: str
     email: EmailStr
     cep: str 
     phone_number: str
     items: List[str]
+
+    class Config:
+        orm_mode = True
+        allow_population_by_field_name = True
+        exclude = {"id"}
 
     @validator("items")
     def validate_items(cls, v):
@@ -35,3 +40,9 @@ class Order(BaseModel):
     @validator("cep")
     def validate_cep(cls, v):
         return validate_brazilian_cep(v)
+    
+class OrderWrite(OrderBase):
+    pass
+
+class OrderRead(OrderBase):
+    id: int
