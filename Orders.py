@@ -30,7 +30,7 @@ def get_all_orders():
         print(f"Error fetching orders from the API: {e}")
         return []
     
-class CreateOrderWindow(tk.Toplevel):
+class OrderWindow(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
         self.title("Create Order")
@@ -200,5 +200,5 @@ class CreateOrderWindow(tk.Toplevel):
 
 if __name__ == "__main__":
     root = tk.Tk()
-    CreateOrderWindow(root)
+    OrderWindow(root)
     root.mainloop()
