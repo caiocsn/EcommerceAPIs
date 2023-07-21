@@ -1,41 +1,59 @@
-import subprocess
-import psutil
+import os
 import threading
 import time
+import uvicorn
+import init
+import contextlib
 
-# Function to start a server as a subprocess
-def start_server(command):
-    subprocess.Popen(command, shell=True)
+from GUI.Main import MainApplication
+from InventoryAPI.main import app as inventory_app
+from OrdersAPI.main import app as orders_app
+from PaymentAPI.main import app as payment_app
+from ShippingAPI.main import app as shipping_app
 
-# Function to stop a server using its process ID
-def stop_server(pid):
-    process = psutil.Process(pid)
-    process.terminate()
+class Server(uvicorn.Server):
+    def install_signal_handlers(self):
+        pass
 
-# List of commands to start the servers
-inventory_api_command = "uvicorn InventoryAPI.main:app --port 8000 --reload"
-orders_api_command = "uvicorn OrdersAPI.main:app --port 8001 --reload"
+    @contextlib.contextmanager
+    def run_in_thread(self):
+        thread = threading.Thread(target=self.run)
+        thread.start()
+        try:
+            while not self.started:
+                time.sleep(1e-3)
+            yield
+        finally:
+            self.should_exit = True
+            thread.join()
 
-# Start the servers in separate threads
-inventory_thread = threading.Thread(target=start_server, args=(inventory_api_command,))
-orders_thread = threading.Thread(target=start_server, args=(orders_api_command,))
-inventory_thread.start()
-orders_thread.start()
+init.env()
 
-# Sleep to allow the servers to start
-time.sleep(10)
+inventory_api_port = int(os.environ.get('INVENTORY_API_PORT'))
+orders_api_port = int(os.environ.get('ORDERS_API_PORT'))
+payment_api_port = int(os.environ.get('PAYMENT_API_PORT'))
+shipping_api_port = int(os.environ.get('SHIPPING_API_PORT'))
 
-# Get the process IDs of the servers
-inventory_api_pid = psutil.Process().children(recursive=True)[0].pid
-orders_api_pid = psutil.Process().children(recursive=True)[1].pid
+config = uvicorn.Config(orders_app, host="127.0.0.1", port=orders_api_port)
+order_server = Server(config=config)
 
-try:
-    # Wait for the main code to be interrupted
-    while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    # Stop the servers when the main code is interrupted
-    stop_server(inventory_api_pid)
-    stop_server(orders_api_pid)
-    inventory_thread.join()
-    orders_thread.join()
+config = uvicorn.Config(inventory_app, host="127.0.0.1", port=inventory_api_port)
+inventory_server = Server(config=config)
+
+config = uvicorn.Config(payment_app, host="127.0.0.1", port=payment_api_port)
+payment_server = Server(config=config)
+
+config = uvicorn.Config(shipping_app, host="127.0.0.1", port=shipping_api_port)
+shipping_server = Server(config=config)
+
+def run_servers():
+    config = uvicorn.Config(orders_app, host="127.0.0.1", port=5000)
+    server = Server(config=config)
+    server.run_in_thread()
+
+with order_server.run_in_thread():
+    with inventory_server.run_in_thread():
+        with payment_server.run_in_thread():
+            with shipping_server.run_in_thread():
+                    app = MainApplication()
+                    app.mainloop()

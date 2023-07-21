@@ -21,6 +21,7 @@ class OrderDB(Base):
     cep = Column(String)
     phone_number = Column(String)
     items = Column(String)
-    
+    total = Column(Float)
+
     status_choices = ["created", "cancelled", "payed", "processing", "sent", "delivered"]
     status = Column(Enum(*status_choices))

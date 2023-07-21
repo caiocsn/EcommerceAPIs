@@ -5,8 +5,8 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(parent_dir)
 
 from fastapi import FastAPI, HTTPException, Query
-
 from typing import List, Optional, Dict
+from sqlalchemy.exc import IntegrityError
 
 from models.models import Item
 from models.db_models import ItemDB
@@ -16,13 +16,18 @@ app = FastAPI()
 
 @app.post("/items/", response_model=Item)
 def create_item(item: Item):
-    db = SessionLocal()
-    db_item = ItemDB(**item.dict())
-    db.add(db_item)
-    db.commit()
-    db.refresh(db_item)
-    db.close()
-    return Item(**db_item.__dict__)
+    try:
+        db = SessionLocal()
+        db_item = ItemDB(**item.dict())
+        db.add(db_item)
+        db.commit()
+        db.refresh(db_item)
+        db.close()
+        return Item(**db_item.__dict__)
+    
+    except IntegrityError:
+        raise HTTPException(status_code=400, detail="The ID value is not unique")
+
 
 @app.get("/items/", response_model=List[Item])
 def read_items(item_ids: Optional[List[int]] = Query(None)):
@@ -40,17 +45,20 @@ def read_items(item_ids: Optional[List[int]] = Query(None)):
 
 @app.put("/items/{item_id}", response_model=Item)
 def update_item(item_id: int, item: Item):
-    db = SessionLocal()
-    db_item = db.query(ItemDB).filter(ItemDB.id == item_id).first()
-    if db_item is None:
+    try:
+        db = SessionLocal()
+        db_item = db.query(ItemDB).filter(ItemDB.id == item_id).first()
+        if db_item is None:
+            db.close()
+            raise HTTPException(status_code=404, detail="Item not found")
+        for key, value in item.dict().items():
+            setattr(db_item, key, value)
+        db.commit()
+        db.refresh(db_item)
         db.close()
-        raise HTTPException(status_code=404, detail="Item not found")
-    for key, value in item.dict().items():
-        setattr(db_item, key, value)
-    db.commit()
-    db.refresh(db_item)
-    db.close()
-    return Item(**db_item.__dict__)
+        return Item(**db_item.__dict__)
+    except IntegrityError:
+        raise HTTPException(status_code=400, detail="The ID value is not unique")
 
 @app.delete("/items/{item_id}", response_model=Item)
 def delete_item(item_id: int):
@@ -67,6 +75,8 @@ def delete_item(item_id: int):
 @app.put("/items/subtract/")
 def subtract_items(items_to_subtract: Dict[int, int]):
     db = SessionLocal()
+    
+    total = 0
 
     for item_id, quantity_to_subtract in items_to_subtract.items():
         item = db.query(ItemDB).filter(ItemDB.id == item_id).first()
@@ -84,8 +94,9 @@ def subtract_items(items_to_subtract: Dict[int, int]):
             raise HTTPException(status_code=400, detail=f"Not enough items of id {item_id} in the inventory")
 
         item.quantity -= quantity_to_subtract
+        total += quantity_to_subtract * item.price
 
     db.commit()
     db.close()
 
-    return {"message": "Items subtracted successfully"}
+    return {"message": "Items subtracted successfully", "total": total}
