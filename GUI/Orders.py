@@ -13,28 +13,7 @@ import json
 import random
 
 from models.models import OrderWrite
-
-def get_all_items():
-    try:
-        response = requests.get("http://127.0.0.1:8000/items/")
-        response.raise_for_status()
-        items_data = response.json()
-        return items_data
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching items from the API: {e}")
-        return []
-
-def get_all_orders():
-    try:
-        response = requests.get("http://127.0.0.1:8001/orders/")
-        response.raise_for_status()
-        orders_data = response.json()
-        return orders_data
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching orders from the API: {e}")
-        return []
+from .utils import *
 
 class OrderForm(tk.Frame):
     def __init__(self, master):
@@ -102,7 +81,7 @@ class AddOrdermWindow(tk.Toplevel):
                 items=json.loads(self.order_form.items_var.get()),
             )            
 
-            response = requests.post("http://127.0.0.1:8001/orders/", json=order_data.dict())
+            response = requests.post(os.environ.get('ORDERS_API_URL'), json=order_data.dict())
             response.raise_for_status()  # Raise an exception for non-2xx responses
 
             # Display success message
@@ -223,7 +202,7 @@ class OrderWindow(tk.Toplevel):
                 phone_number=random_phone_number,
                 items=random_items,
             )
-            response = requests.post("http://127.0.0.1:8001/orders/", json=order_data.dict())
+            response = requests.post(os.environ.get('ORDERS_API_URL'), json=order_data.dict())
             response.raise_for_status()  # Raise an exception for non-2xx responses
 
         except requests.exceptions.RequestException as e:

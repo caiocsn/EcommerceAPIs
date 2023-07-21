@@ -1,18 +1,9 @@
+import os
 import tkinter as tk
 import tkinter.ttk as ttk
 import requests
 import json
-
-def get_all_orders():
-    try:
-        response = requests.get("http://127.0.0.1:8001/orders/")
-        response.raise_for_status()
-        orders_data = response.json()
-        return orders_data
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching orders from the API: {e}")
-        return []
+from .utils import *
 
 class ShippingWindow(tk.Toplevel):
     def __init__(self, master):
@@ -73,7 +64,7 @@ class ShippingWindow(tk.Toplevel):
         selected_item = self.order_tree.selection()
         if selected_item:
             order_id = self.order_tree.item(selected_item, "text")
-            response = requests.post(f"http://127.0.0.1:8003/shipping/processing/{order_id}")
+            response = requests.post(os.environ.get('SHIPPING_API_URL') + f"processing/{order_id}")
             if response.status_code == 200:
                 tk.messagebox.showinfo("Order status changed to processing", "Status changed successfully!")
                 self.populate_order_tree()
@@ -84,7 +75,7 @@ class ShippingWindow(tk.Toplevel):
         selected_item = self.order_tree.selection()
         if selected_item:
             order_id = self.order_tree.item(selected_item, "text")
-            response = requests.post(f"http://127.0.0.1:8003/shipping/sent/{order_id}")
+            response = requests.post(os.environ.get('SHIPPING_API_URL') + f"sent/{order_id}")
             if response.status_code == 200:
                 tk.messagebox.showinfo("Order status changed to sent", "Status changed successfully!")
                 self.populate_order_tree()
@@ -95,7 +86,7 @@ class ShippingWindow(tk.Toplevel):
         selected_item = self.order_tree.selection()
         if selected_item:
             order_id = self.order_tree.item(selected_item, "text")
-            response = requests.post(f"http://127.0.0.1:8003/shipping/delivered/{order_id}")
+            response = requests.post(os.environ.get('SHIPPING_API_URL') + f"delivered/{order_id}")
             if response.status_code == 200:
                 tk.messagebox.showinfo("Order status changed to delivered", "Status changed successfully!")
                 self.populate_order_tree()

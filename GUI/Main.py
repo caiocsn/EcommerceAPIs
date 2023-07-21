@@ -1,8 +1,14 @@
+import os 
+import sys
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(parent_dir)
+
 import tkinter as tk
-from Orders import OrderWindow
-from Payment import PaymentWindow
-from Shipping import ShippingWindow
-from Items import ItemWindow
+from .Orders import OrderWindow
+from .Payment import PaymentWindow
+from .Shipping import ShippingWindow
+from .Items import ItemWindow
 
 class MainApplication(tk.Tk):
     def __init__(self):
@@ -34,8 +40,5 @@ class MainApplication(tk.Tk):
     def on_window_close(self, window):
         window.destroy()
         window = None
-
-if __name__ == "__main__":
-    app = MainApplication()
-    app.mainloop()
+    
     

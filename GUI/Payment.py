@@ -2,17 +2,8 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import requests
 import json
-
-def get_all_orders():
-    try:
-        response = requests.get("http://127.0.0.1:8001/orders/")
-        response.raise_for_status()
-        orders_data = response.json()
-        return orders_data
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching orders from the API: {e}")
-        return []
+import os
+from .utils import *
 
 class PaymentWindow(tk.Toplevel):
     def __init__(self, master):
@@ -74,7 +65,7 @@ class PaymentWindow(tk.Toplevel):
         selected_item = self.order_tree.selection()
         if selected_item:
             order_id = self.order_tree.item(selected_item, "text")
-            response = requests.post(f"http://127.0.0.1:8002/payments/confirm/{order_id}")
+            response = requests.post(os.environ.get('PAYMENT_API_URL') + f"confirm/{order_id}")
             if response.status_code == 200:
                 tk.messagebox.showinfo("Payment Confirmation", "Payment confirmed successfully!")
                 self.populate_order_tree()
@@ -85,7 +76,7 @@ class PaymentWindow(tk.Toplevel):
         selected_item = self.order_tree.selection()
         if selected_item:
             order_id = self.order_tree.item(selected_item, "text")
-            response = requests.post(f"http://127.0.0.1:8002/payments/cancel/{order_id}")
+            response = requests.post(os.environ.get('PAYMENT_API_URL') + f"cancel/{order_id}")
             if response.status_code == 200:
                 tk.messagebox.showinfo("Payment Cancellation", "Payment cancelled successfully!")
                 self.populate_order_tree()

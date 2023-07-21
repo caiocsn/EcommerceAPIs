@@ -1,19 +1,9 @@
+import os
 import random
 import tkinter as tk
 from tkinter import ttk, messagebox
 import requests
-
-def get_all_items():
-    try:
-        response = requests.get("http://127.0.0.1:8000/items/")
-        response.raise_for_status()
-        items_data = response.json()
-        return items_data
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching items from the API: {e}")
-        return []
-    
+from .utils import *    
 
 class ItemForm(tk.Frame):
     def __init__(self, master):
@@ -67,7 +57,7 @@ class AddItemWindow(tk.Toplevel):
         }
 
         try:
-            response = requests.post("http://127.0.0.1:8000/items/", json=item_data)
+            response = requests.post(os.environ.get('INVENTORY_API_URL'), json=item_data)
             response.raise_for_status()
 
             # Display success message
@@ -109,7 +99,7 @@ class EditItemWindow(tk.Toplevel):
         }
 
         try:
-            response = requests.put(f"http://127.0.0.1:8000/items/{item_data['id']}", json=item_data)
+            response = requests.put(os.environ.get('INVENTORY_API_URL') + f"{item_data['id']}", json=item_data)
             response.raise_for_status()
 
             # Display success message
@@ -181,7 +171,7 @@ class ItemWindow(tk.Toplevel):
                 item_id = self.item_tree.item(selected_item, "values")[0]
                 if tk.messagebox.askyesno("Confirm Deletion", "Are you sure you want to delete this item?"):
                     try:
-                        response = requests.delete(f"http://127.0.0.1:8000/items/{item_id}")
+                        response = requests.delete(os.environ.get('INVENTORY_API_URL') + f"{item_id}")
                         response.raise_for_status()
                         tk.messagebox.showinfo("Success", "Item deleted successfully!")
                         self.load_items()
@@ -215,7 +205,7 @@ class ItemWindow(tk.Toplevel):
         }
 
         try:
-            response = requests.post("http://127.0.0.1:8000/items/", json=item_data)
+            response = requests.post(os.environ.get('INVENTORY_API_URL'), json=item_data)
             response.raise_for_status()
             self.load_items()     
 
