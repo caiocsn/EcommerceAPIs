@@ -213,6 +213,10 @@ class OrderWindow(tk.Toplevel):
             # Display error message if the JSON parsing fails
             messagebox.showerror("Error", f"Error parsing JSON: {e}")
 
+        except IndexError as e:
+            # Display error message if the JSON parsing fails
+            messagebox.showerror("Error", f"There are not items recorded: {e}")
+
         except Exception as e:
             # Display generic error message
             messagebox.showerror("Error", f"Error: {e}")

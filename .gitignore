@@ -26,6 +26,3 @@ env/
 
 # Ignore .env file with sensitive information (if applicable)
 .env
-
-# Ignore migration files (if using Alembic)
-alembic/versions/
