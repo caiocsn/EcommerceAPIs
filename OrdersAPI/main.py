@@ -20,12 +20,15 @@ app = FastAPI()
 def create_order(order: OrderWrite):
     order_dict = order.dict()
     inventory_status = call_subtract_items_api(order_dict["items"])    
-    if  inventory_status != 200:
-        raise HTTPException(status_code = inventory_status , detail="Items not available")
+    if  inventory_status.status_code != 200:
+        raise HTTPException(status_code = inventory_status.status_code , detail="Items not available")
     
+    total = round(inventory_status.json().get("total"), 2)
+
     db = SessionLocal()
     order_dict["items"] = json.dumps(order_dict["items"])
     order_dict["status"] = "created"
+    order_dict["total"] = total
     db_order = OrderDB(**order_dict)
     db.add(db_order)
     db.commit()

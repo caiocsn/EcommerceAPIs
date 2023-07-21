@@ -6,5 +6,5 @@ def call_subtract_items_api(items: Dict[int, int]) -> int:
 
     response = requests.put(url, json=items)
 
-    return response.status_code
+    return response
 

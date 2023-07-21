@@ -39,6 +39,7 @@ class OrderWrite(OrderBase):
     pass
 
 class OrderRead(OrderBase):
+    total: float
     id: int
     status: str
 
