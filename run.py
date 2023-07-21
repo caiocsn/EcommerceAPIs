@@ -17,7 +17,7 @@ class MainApplication(tk.Tk):
         self.orders_button.pack(pady=5)
         self.payment_button = tk.Button(self, text="Payment", command= lambda: self.open_window(self.payment_window, PaymentWindow))
         self.payment_button.pack(pady=5)
-        self.payment_button = tk.Button(self, text="Payment", command= lambda: self.open_window(self.shipping_window, ShippingWindow))
+        self.payment_button = tk.Button(self, text="Shipping", command= lambda: self.open_window(self.shipping_window, ShippingWindow))
         self.payment_button.pack(pady=5)
 
     def open_window(self, window, creator):
