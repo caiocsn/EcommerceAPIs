@@ -1,41 +1,28 @@
-import subprocess
-import psutil
-import threading
-import time
+import tkinter as tk
+from Orders import CreateOrderWindow
 
-# Function to start a server as a subprocess
-def start_server(command):
-    subprocess.Popen(command, shell=True)
+class MainApplication(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Main Interface")
+        self.geometry("300x100")
+        
+        self.create_user_window = None
 
-# Function to stop a server using its process ID
-def stop_server(pid):
-    process = psutil.Process(pid)
-    process.terminate()
+        self.create_user_button = tk.Button(self, text="Orders", command=self.open_create_user_window)
+        self.create_user_button.pack(pady=20)
 
-# List of commands to start the servers
-inventory_api_command = "uvicorn InventoryAPI.main:app --port 8000 --reload"
-orders_api_command = "uvicorn OrdersAPI.main:app --port 8001 --reload"
+    def open_create_user_window(self):
+        if not self.create_user_window:
+            self.create_user_window = CreateOrderWindow(self)
+            self.create_user_window.protocol("WM_DELETE_WINDOW", self.on_create_user_close)
+        else:
+            self.create_user_window.deiconify()
 
-# Start the servers in separate threads
-inventory_thread = threading.Thread(target=start_server, args=(inventory_api_command,))
-orders_thread = threading.Thread(target=start_server, args=(orders_api_command,))
-inventory_thread.start()
-orders_thread.start()
+    def on_create_user_close(self):
+        self.create_user_window.destroy()
+        self.create_user_window = None
 
-# Sleep to allow the servers to start
-time.sleep(10)
-
-# Get the process IDs of the servers
-inventory_api_pid = psutil.Process().children(recursive=True)[0].pid
-orders_api_pid = psutil.Process().children(recursive=True)[1].pid
-
-try:
-    # Wait for the main code to be interrupted
-    while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    # Stop the servers when the main code is interrupted
-    stop_server(inventory_api_pid)
-    stop_server(orders_api_pid)
-    inventory_thread.join()
-    orders_thread.join()
+if __name__ == "__main__":
+    app = MainApplication()
+    app.mainloop()

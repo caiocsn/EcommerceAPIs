@@ -9,10 +9,9 @@ def validate_brazilian_phone_number(phone_number: str) -> str:
     return phone_number
 
 def validate_brazilian_cep(cep: str) -> str:
-    # Brazilian CEP pattern: 5 digits, followed by a dash, and 3 more digits
-    pattern = r"^\d{5}-\d{3}$"
-    if not re.match(pattern, cep):
-        raise ValueError("Invalid Brazilian CEP format. Use 'XXXXX-XXX'")
+    digits_only = "".join(filter(str.isdigit, cep))
+    if len(digits_only) != 8:
+        raise ValueError("Invalid Brazilian CEP format. Use 'XXXXXXXX'")
     return cep
 
 class OrderBase(BaseModel):
