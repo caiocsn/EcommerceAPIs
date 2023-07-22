@@ -4,7 +4,7 @@
 
 O projeto consiste de APIs REST independentes e escaláveis, que podem ser facilmente integradas por aplicações web ou mobile. Os dados de pedidos e inventário são armazenados em um banco de dados local, com a possibilidade de uso de uma solução mais robusta.
 
-![Alt Text](images\archtecture1.jpg)
+![Alt Text]([images\archtecture1.jpg](https://github.com/caiocsn/EcommerceAPIs/blob/main/images/archtecture1.jpg))
 
 O sistema é controlado pelo script run.py, que configura as variáveis de ambiente, inicia os serviços (APIs) em servidores separados e exibe a interface gráfica. Essa interface permite realizar operações como criação de pedidos, itens e mudança de status, interagindo diretamente com as APIs. Todos os dados do E-commerce são armazenados no banco de dados, que é acessado através dos serviços.
 
