@@ -63,3 +63,8 @@ Com o ambiente configurado o projeto pode ser executado através do comando:
 ```shell
 $ python run.py
 ```
+
+
+## Implementações futuras
+- Implementar timestamp dos eventos de criação e transição de estado
+- Habilitar carregamento de pedidos e itens em lote, a partir de arquivo.
