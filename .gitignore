@@ -26,3 +26,6 @@ env/
 
 # Ignore .env file with sensitive information (if applicable)
 .env
+
+# Ignore env folder
+/myenv

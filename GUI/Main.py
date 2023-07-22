@@ -9,6 +9,7 @@ from .Orders import OrderWindow
 from .Payment import PaymentWindow
 from .Shipping import ShippingWindow
 from .Items import ItemWindow
+from .Report import ExcelExportWindow
 
 class MainApplication(tk.Tk):
     def __init__(self):
@@ -20,6 +21,7 @@ class MainApplication(tk.Tk):
         self.payment_window = None
         self.shipping_window = None
         self.items_window = None
+        self.report_window = None
 
         self.orders_button = tk.Button(self, text="Orders", command= lambda: self.open_window(self.orders_window, OrderWindow))
         self.orders_button.pack(pady=5)
@@ -29,6 +31,8 @@ class MainApplication(tk.Tk):
         self.payment_button.pack(pady=5)
         self.payment_button = tk.Button(self, text="Inventory", command= lambda: self.open_window(self.items_window, ItemWindow))
         self.payment_button.pack(pady=5)
+        self.report_button = tk.Button(self, text="Report", command = lambda: ExcelExportWindow(self))
+        self.report_button.pack(pady=5)
 
     def open_window(self, window, creator):
         if not window:
