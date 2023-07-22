@@ -15,6 +15,22 @@ Os pedidos são criados via requisição à API de pedidos, onde são validadas 
 
 **A verificação de disponibilidade de inventário é automática.**
 
+O campo item deve ser um dicionário no formato:
+
+```json
+{"item_1_id": quantity,
+"item_2_id": quantity}
+```
+
+Exemplo
+```json
+{"1": 15,
+"2": 3}
+```
+
+
+Naturalmente, os itens cujos ids foram inseridos devem estar presentes no inventário em quantidade suficiente para que o pedido possa ser criado.
+
 ### Pagamento
 O fluxo de pagamento simula as funções de "confirmar" e "cancelar" para pedidos no estágio "criado", sem afetar pedidos em outros estágios. **A automação dessas operações requer integração com instituições financeiras que possibilitem a confirmação de pagamentos de forma automatizada.**
 
@@ -26,6 +42,9 @@ Este serviço é responsável por gerenciar o estoque, quantidades e registros d
 Essa funcionalidade gerencia os status de envio do pedido, com estágios válidos sendo "processando", "enviado" e "entregue". Apenas pedidos no estado "pago" podem ter seus status alterados por esse serviço. A atualização dos estados nem sempre é linear, podendo pular etapas logísticas. 
 
 **A automação dessa etapa depende de integrações com sistemas de gerenciamento e provedores logísticos.**
+
+### Relatório
+A funcionalidade de relatórios permite exportar os dados dos bancos de pedidos e inventário para um arquivo Excel de forma fácil, permitindo análises e manipulações simples dos dados. Isso facilita a visualização e o gerenciamento das informações em um formato prático e amigável.
 
 ## APIs
 
